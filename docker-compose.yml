@@ -1,0 +1,13 @@
+version: '3.9'
+services:
+  server:
+    build:
+      context: .
+      # dockerfile: docker/apache/Dockerfile
+    restart: unless-stopped
+    volumes:
+      # - ./public:/var/www/html/public
+      - ./infra/apache/logs:/var/log/apache2
+      - ./:/var/www/html
+    ports:
+      - 8000:80
