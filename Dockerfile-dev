@@ -1,8 +1,12 @@
-FROM php:8.3-apache as base
-WORKDIR /var/app
-
+FROM php:8.3-apache
+# RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 RUN apt-get update
 RUN apt-get install -y \
+    git \
+    zip \
+    curl \
+    sudo \
+    unzip \
     libzip-dev \
     libicu-dev \
     libbz2-dev \
@@ -10,7 +14,8 @@ RUN apt-get install -y \
     libjpeg-dev \
     libmcrypt-dev \
     libreadline-dev \
-    libfreetype6-dev 
+    libfreetype6-dev \
+    g++
 
 RUN docker-php-ext-install \
     zip \
@@ -31,29 +36,15 @@ COPY infra/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
 # 3. mod_rewrite for URL rewrite and mod_headers for .htaccess extra headers like Access-Control-Allow-Origin-
 RUN a2enmod rewrite headers
 
-FROM base AS build
-WORKDIR /app/build
-COPY . .
+# 5. Composer
+RUN curl -sS https://getcomposer.org/installer | php
+RUN mv composer.phar /usr/local/bin/composer
+RUN chmod +x /usr/local/bin/composer
+RUN composer self-update
 
+# 6. NodeJS
 ENV NODE_VERSION=20.12.2
-# RUN apt-get update
-# RUN apt-get install -y \
-#     git \
-#     zip \
-#     curl \
-#     sudo \
-#     unzip \
-#     libzip-dev \
-#     libicu-dev \
-#     libbz2-dev \
-#     libpng-dev \
-#     libjpeg-dev \
-#     libmcrypt-dev \
-#     libreadline-dev \
-#     libfreetype6-dev \
-#     g++
-
-COPY --from=composer /usr/bin/composer /usr/bin/composer
+RUN apt install -y curl
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 ENV NVM_DIR=/root/.nvm
 RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
@@ -63,10 +54,6 @@ ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 RUN node --version
 RUN npm --version
 
-RUN composer install --no-dev
-RUN npm install && npm run build
-
-FROM base AS final
 WORKDIR /var/app
-COPY --from=build /app/build .
+
 EXPOSE 80
