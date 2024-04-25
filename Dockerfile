@@ -10,7 +10,7 @@ RUN apt-get install -y \
     libjpeg-dev \
     libmcrypt-dev \
     libreadline-dev \
-    libfreetype6-dev 
+    libfreetype6-dev
 
 RUN docker-php-ext-install \
     zip \
@@ -69,4 +69,5 @@ RUN npm install && npm run build
 FROM base AS final
 WORKDIR /var/app
 COPY --from=build /app/build .
+RUN chown www-data:www-data -R storage/
 EXPOSE 80
