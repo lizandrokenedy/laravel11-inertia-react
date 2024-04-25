@@ -17,7 +17,7 @@ variables:
   tag: '$(Build.BuildId)'
 
   # Agent VM image name
-  vmImageName: 'training-training-group'
+  vmImageName: 'training-pool'
 
 stages:
 - stage: Build
