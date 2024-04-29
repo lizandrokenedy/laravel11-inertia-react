@@ -70,7 +70,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                             </div>
 
                             <div className="flex justify-center mb-3">
-                                <h1 className="text-white">Versão: 3</h1>
+                                <h1 className="text-white">Versão: 4</h1>
                             </div>
 
                             {/* <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
